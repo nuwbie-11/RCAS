@@ -1,30 +1,57 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import 'package:rcas/Components/TextFields/my_text_field.dart';
+import 'package:rcas/pages/reset_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final VoidCallback showRegisterPage;
+  const LoginPage({Key? key, required this.showRegisterPage}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future signIn() async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text(e.message.toString()),
+            );
+          });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       extendBody: true,
-      body: SingleChildScrollView(
-        child: SafeArea(
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -114,28 +141,52 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(
-                height: 35,
+                height: 20,
               ),
               MyTextField(
                 hint: 'Email',
-                controller: emailController,
+                controller: _emailController,
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               MyTextField(
                 hint: "Password",
-                controller: passwordController,
+                controller: _passwordController,
                 obsucreText: true,
+                isPassword: true,
               ),
               SizedBox(
-                height: 15,
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return ResetPasswordPage();
+                      }));
+                    },
+                    child: Text(
+                      "Forgor Password ?",
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: GestureDetector(
                   onTap: () {
-                    print("Sign in");
+                    signIn();
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -166,9 +217,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Text("Not A Member ? "),
                   GestureDetector(
-                    onTap: () {
-                      print("Registering");
-                    },
+                    onTap: widget.showRegisterPage,
                     child: Text(
                       "Register",
                       style: TextStyle(color: Colors.blue),

@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-class MyTextField extends StatelessWidget {
+class MyTextField extends StatefulWidget {
+  final bool isPassword;
   final String hint;
-  final bool obsucreText;
+  bool obsucreText;
   final TextEditingController controller;
   final bool formatted;
-  const MyTextField({
-    super.key,
-    required this.hint,
-    required this.controller,
-    this.obsucreText = false,
-    this.formatted = true,
-  });
+  final TextInputType keyboard;
+  MyTextField(
+      {super.key,
+      required this.hint,
+      required this.controller,
+      this.obsucreText = false,
+      this.formatted = true,
+      this.isPassword = false,
+      this.keyboard = TextInputType.text});
 
+  @override
+  State<MyTextField> createState() => _MyTextFieldState();
+}
+
+class _MyTextFieldState extends State<MyTextField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -27,18 +36,28 @@ class MyTextField extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.only(left: 25),
           child: TextField(
+            keyboardType: widget.keyboard,
             inputFormatters: [
-              formatted
+              widget.formatted
                   ? FilteringTextInputFormatter.deny(
                       RegExp(r'\s')) // Deny spaces
                   : FilteringTextInputFormatter.deny(RegExp(r'')),
             ],
-            controller: controller,
-            obscureText: obsucreText,
+            controller: widget.controller,
+            obscureText: widget.obsucreText,
             obscuringCharacter: '*',
             decoration: InputDecoration(
+              suffixIcon: widget.isPassword
+                  ? IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.obsucreText = !widget.obsucreText;
+                        });
+                      },
+                      icon: Icon(Icons.remove_red_eye_rounded))
+                  : null,
               border: InputBorder.none,
-              hintText: hint,
+              hintText: widget.hint,
               hintStyle: TextStyle(
                 color: Colors.grey[400],
               ),
@@ -46,6 +65,6 @@ class MyTextField extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ).animate().fadeIn().slide();
   }
 }
