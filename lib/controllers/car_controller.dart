@@ -9,10 +9,24 @@ class CarController {
   }
 
   static Future getCars() async {
-    // Map maps = {};
     var snapsots = await _db.get();
     final allData = snapsots.docs.map((doc) => doc.data()).toList();
-    return (allData);
-    // return CarModel.fromJson(res.docs);
+
+    return List.generate(
+        allData.length, (index) => CarModel.fromJson(allData[index]));
+  }
+
+  static findCars(String imgUrl) async {
+    var res = await _db.where('imgUrl', isEqualTo: imgUrl).get();
+    // print(res.docs[0].reference.id);
+    return res.docs[0].reference.id;
+  }
+
+  static deleteCar(String id) async {
+    await _db.doc(id).delete();
+  }
+
+  static updateCar(String id, CarModel model) async {
+    await _db.doc(id).update(model.toMap());
   }
 }

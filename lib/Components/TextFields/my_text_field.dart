@@ -9,6 +9,7 @@ class MyTextField extends StatefulWidget {
   final TextEditingController controller;
   final bool formatted;
   final TextInputType keyboard;
+  final readOnly;
   MyTextField(
       {super.key,
       required this.hint,
@@ -16,6 +17,7 @@ class MyTextField extends StatefulWidget {
       this.obsucreText = false,
       this.formatted = true,
       this.isPassword = false,
+      this.readOnly = false,
       this.keyboard = TextInputType.text});
 
   @override
@@ -37,6 +39,7 @@ class _MyTextFieldState extends State<MyTextField> {
           padding: EdgeInsets.only(left: 25),
           child: TextField(
             keyboardType: widget.keyboard,
+            readOnly: widget.readOnly,
             inputFormatters: [
               widget.formatted
                   ? FilteringTextInputFormatter.deny(

@@ -10,9 +10,15 @@ class UserController {
 
   static Future getUser(String email) async {
     var res = await _db.where('email', isEqualTo: email).get();
-    // print(res.docs[0].data());
-    // var user = UserModel.fromJson(res.docs[0].data());
-    // print(user.age);
     return UserModel.fromJson(res.docs[0].data());
+  }
+
+  static Future findDocId(String email) async {
+    var res = await _db.where('email', isEqualTo: email).get();
+    return res.docs[0].reference.id;
+  }
+
+  static Future updateUser(String id, UserModel user) async {
+    await _db.doc(id).update(user.toMap());
   }
 }

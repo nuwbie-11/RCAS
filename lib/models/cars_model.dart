@@ -3,7 +3,7 @@ class CarModel {
   final String imgUrl;
   final String manufacturer;
   final String ownerMail;
-  final String renterMail;
+  String renterMail;
   final int year;
 
   CarModel(
